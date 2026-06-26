@@ -54,3 +54,21 @@ test("deducts unpumpable ballast as metric tonnes", () => {
   assert.equal(result.unpumpableBallastMt, 200);
   assert.equal(result.maxCargoMt, 80480);
 });
+
+test("combines Panamax standard HFO and diesel oil as bunkers", () => {
+  const result = calculateCargoUptake({
+    summerDeadweightMt: 82000,
+    summerDraftM: 14.45,
+    loadPortMaxDraftM: 14.45,
+    tpcMt: 67,
+    heavyFuelOilMt: 1000,
+    dieselOilMt: 250,
+    constantsMt: 350,
+    freshwaterMt: 200,
+    unpumpableBallastMt: 200
+  });
+
+  assert.equal(result.bunkersMt, 1250);
+  assert.equal(result.deductionsMt, 2000);
+  assert.equal(result.maxCargoMt, 80000);
+});

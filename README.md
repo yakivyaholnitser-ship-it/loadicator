@@ -56,6 +56,21 @@ team's chartering convention, its questionnaire quantity is always normalized
 to metric tonnes, even when the source labels it as cubic metres. Deduct that
 quantity directly from cargo uptake without a water-density conversion.
 
+## Panamax Standard Inputs
+
+For baseline PMX/KMX work, use these editable assumptions:
+
+- PMX deadweight range: 72,000-85,000 mt;
+- KMX deadweight range: 82,000-85,000 mt;
+- heavy fuel oil: 1,000 mt;
+- diesel oil: 250 mt;
+- constants fallback: 350 mt when not supplied or found in the questionnaire;
+- unpumpable ballast fallback: 200 mt when not found in the questionnaire;
+- fresh water on board: 200 mt.
+
+The browser stores the last edited standard set locally and can apply it to the
+current cargo scenario. HFO and diesel oil are combined as bunker deductions.
+
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software
 (CSV, Excel, PDF, or another supported format), remove confidential fields when

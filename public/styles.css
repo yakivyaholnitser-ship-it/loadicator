@@ -95,6 +95,26 @@ p {
   align-self: start;
 }
 
+.standards {
+  grid-column: 1 / -1;
+}
+
+.standards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.standards-note {
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+
+.standards-note.saved {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .importer h2 {
   margin-bottom: 10px;
 }
@@ -353,7 +373,8 @@ input:focus {
 
   .workspace,
   .grid,
-  .analysis-groups {
+  .analysis-groups,
+  .standards-grid {
     grid-template-columns: 1fr;
   }
 
@@ -363,7 +384,8 @@ input:focus {
   }
 
   .result,
-  .questionnaire-analysis {
+  .questionnaire-analysis,
+  .standards {
     grid-column: auto;
   }
 

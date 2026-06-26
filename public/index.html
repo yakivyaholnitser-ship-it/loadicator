@@ -34,6 +34,30 @@
           <ul class="upload-list" id="upload-list"></ul>
         </section>
 
+        <section class="panel standards" id="panamax-standards">
+          <div class="form-header">
+            <div>
+              <p class="eyebrow">Chartering assumptions</p>
+              <h2>Panamax Standard Inputs</h2>
+            </div>
+            <button type="button" id="apply-standards">Save &amp; apply</button>
+          </div>
+          <div class="standards-grid">
+            <label>PMX DWT min mt<input name="pmxDwtMinMt" type="number" value="72000" /></label>
+            <label>PMX DWT max mt<input name="pmxDwtMaxMt" type="number" value="85000" /></label>
+            <label>KMX DWT min mt<input name="kmxDwtMinMt" type="number" value="82000" /></label>
+            <label>KMX DWT max mt<input name="kmxDwtMaxMt" type="number" value="85000" /></label>
+            <label>Heavy fuel oil mt<input name="heavyFuelOilMt" type="number" step="0.01" value="1000" /></label>
+            <label>Diesel oil mt<input name="dieselOilMt" type="number" step="0.01" value="250" /></label>
+            <label>Constants fallback mt<input name="constantsMt" type="number" step="0.01" value="350" /></label>
+            <label>Unpumpable fallback mt<input name="unpumpableBallastMt" type="number" step="0.01" value="200" /></label>
+            <label>Fresh water on board mt<input name="freshwaterMt" type="number" step="0.01" value="200" /></label>
+          </div>
+          <p class="standards-note" id="standards-note">
+            Constants and unpumpable ballast are fallbacks when the questionnaire has no value.
+          </p>
+        </section>
+
         <section class="panel questionnaire-analysis" id="questionnaire-analysis">
           <div class="analysis-header">
             <div>
@@ -121,16 +145,20 @@
               <input name="stowageFactorCbmPerMt" type="number" step="0.001" value="1.25" />
             </label>
             <label>
-              Bunkers mt
-              <input name="bunkersMt" type="number" step="0.01" value="900" />
+              Heavy fuel oil mt
+              <input name="heavyFuelOilMt" type="number" step="0.01" value="1000" />
+            </label>
+            <label>
+              Diesel oil mt
+              <input name="dieselOilMt" type="number" step="0.01" value="250" />
             </label>
             <label>
               Constants mt
-              <input name="constantsMt" type="number" step="0.01" value="300" />
+              <input name="constantsMt" type="number" step="0.01" value="350" />
             </label>
             <label>
               Fresh water mt
-              <input name="freshwaterMt" type="number" step="0.01" value="120" />
+              <input name="freshwaterMt" type="number" step="0.01" value="200" />
             </label>
             <label>
               Unpumpable ballast mt

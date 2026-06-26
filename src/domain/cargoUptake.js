@@ -17,7 +17,10 @@ export function calculateCargoUptake(input) {
   const tpcMt = numberOrZero(input.tpcMt);
   const grainCapacityCbm = numberOrZero(input.grainCapacityCbm);
   const stowageFactorCbmPerMt = numberOrZero(input.stowageFactorCbmPerMt);
-  const bunkersMt = numberOrZero(input.bunkersMt);
+  const hasSplitFuel = input.heavyFuelOilMt !== undefined || input.dieselOilMt !== undefined;
+  const heavyFuelOilMt = numberOrZero(input.heavyFuelOilMt);
+  const dieselOilMt = numberOrZero(input.dieselOilMt);
+  const bunkersMt = hasSplitFuel ? heavyFuelOilMt + dieselOilMt : numberOrZero(input.bunkersMt);
   const constantsMt = numberOrZero(input.constantsMt);
   const freshwaterMt = numberOrZero(input.freshwaterMt);
   const unpumpableBallastMt = numberOrZero(input.unpumpableBallastMt);
@@ -59,6 +62,9 @@ export function calculateCargoUptake(input) {
     draftLimitedCargoMt: round(draftLimitedCargoMt, 2),
     cubicLimitedCargoMt: Number.isFinite(cubicLimitedCargoMt) ? round(cubicLimitedCargoMt, 2) : null,
     deductionsMt: round(deductionsMt, 2),
+    bunkersMt: round(bunkersMt, 2),
+    heavyFuelOilMt: round(heavyFuelOilMt, 2),
+    dieselOilMt: round(dieselOilMt, 2),
     unpumpableBallastMt: round(unpumpableBallastMt, 2),
     assumptions: {
       waterDensity,

@@ -6,12 +6,46 @@ const uploadList = document.querySelector("#upload-list");
 const analysisStatus = document.querySelector("#analysis-status");
 const analysisSummary = document.querySelector("#analysis-summary");
 const analysisNotes = document.querySelector("#analysis-notes");
+const standardsPanel = document.querySelector("#panamax-standards");
+const applyStandardsButton = document.querySelector("#apply-standards");
+const standardsNote = document.querySelector("#standards-note");
+const STANDARDS_STORAGE_KEY = "loadicator.panamaxStandards";
 const analysisLists = {
   particulars: document.querySelector("#particulars-analysis"),
   cargoSpaces: document.querySelector("#capacity-analysis"),
   tankCapacities: document.querySelector("#tank-analysis"),
   voyageInputs: document.querySelector("#voyage-analysis")
 };
+
+function readNumericInputs(container) {
+  return Object.fromEntries(
+    Array.from(container.querySelectorAll("input[name]")).map((input) => [input.name, Number(input.value)])
+  );
+}
+
+function setNamedInputs(container, values) {
+  for (const [name, value] of Object.entries(values)) {
+    const input = container.querySelector(`input[name="${name}"]`);
+    if (input && Number.isFinite(Number(value))) input.value = value;
+  }
+}
+
+function loadPanamaxStandards() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STANDARDS_STORAGE_KEY));
+    if (saved) setNamedInputs(standardsPanel, saved);
+  } catch {
+    localStorage.removeItem(STANDARDS_STORAGE_KEY);
+  }
+}
+
+applyStandardsButton.addEventListener("click", () => {
+  const standards = readNumericInputs(standardsPanel);
+  localStorage.setItem(STANDARDS_STORAGE_KEY, JSON.stringify(standards));
+  setNamedInputs(form, standards);
+  standardsNote.textContent = "Standards saved locally and applied to the current cargo scenario.";
+  standardsNote.classList.add("saved");
+});
 
 function renderAnalysisItems(list, items) {
   list.replaceChildren(
@@ -122,9 +156,7 @@ function formatMt(value) {
 }
 
 function readFormData() {
-  return Object.fromEntries(
-    Array.from(new FormData(form).entries()).map(([key, value]) => [key, Number(value)])
-  );
+  return readNumericInputs(form);
 }
 
 function renderResult(data) {
@@ -184,3 +216,4 @@ form.addEventListener("submit", async (event) => {
 
 loadUploads();
 loadAnalysis();
+loadPanamaxStandards();
