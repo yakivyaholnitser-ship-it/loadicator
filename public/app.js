@@ -12,6 +12,9 @@ const standardsNote = document.querySelector("#standards-note");
 const stowageFactorInput = form.querySelector('input[name="stowageFactor"]');
 const stowageFactorUnit = form.querySelector('select[name="stowageFactorUnit"]');
 const stowageFactorConversion = document.querySelector("#stowage-factor-conversion");
+const taskForm = document.querySelector("#task-form");
+const taskMessage = document.querySelector("#task-message");
+const taskThread = document.querySelector("#task-thread");
 const STANDARDS_STORAGE_KEY = "loadicator.panamaxStandards";
 const CUBIC_FEET_TO_CUBIC_METERS = 0.028316846592;
 let previousStowageFactorUnit = stowageFactorUnit.value;
@@ -21,6 +24,66 @@ const analysisLists = {
   tankCapacities: document.querySelector("#tank-analysis"),
   voyageInputs: document.querySelector("#voyage-analysis")
 };
+
+function taskBubble(role, text, meta) {
+  const bubble = document.createElement("div");
+  const label = document.createElement("span");
+  const content = document.createElement("div");
+  bubble.className = `task-message ${role}`;
+  label.className = "task-message-meta";
+  label.textContent = meta;
+  content.textContent = text;
+  bubble.append(label, content);
+  return bubble;
+}
+
+function renderTasks(tasks) {
+  if (!tasks.length) return;
+  const messages = [];
+  for (const task of tasks.toReversed()) {
+    messages.push(taskBubble("user", task.message, "Chartering request"));
+    messages.push(
+      taskBubble(
+        "assistant",
+        task.response || "Task received. Structured analysis is pending.",
+        task.response ? "Loadicator analysis" : "Pending analysis"
+      )
+    );
+  }
+  taskThread.replaceChildren(...messages);
+  taskThread.scrollTop = taskThread.scrollHeight;
+}
+
+async function loadTasks() {
+  const response = await fetch("/api/tasks");
+  if (response.ok) renderTasks((await response.json()).tasks);
+}
+
+taskForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const message = taskMessage.value.trim();
+  if (!message) return;
+
+  const submitButton = taskForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitting...";
+  try {
+    const response = await fetch("/api/tasks", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ message })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not submit task");
+    taskMessage.value = "";
+    await loadTasks();
+  } catch (error) {
+    taskThread.replaceChildren(taskBubble("assistant", error.message, "Submission error"));
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit task";
+  }
+});
 
 function readNumericInputs(container) {
   return Object.fromEntries(
@@ -254,3 +317,4 @@ loadUploads();
 loadAnalysis();
 loadPanamaxStandards();
 renderStowageFactorConversion();
+loadTasks();

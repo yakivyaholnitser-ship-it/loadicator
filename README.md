@@ -75,6 +75,15 @@ Cargo stowage factor accepts either cubic feet per metric tonne or cubic metres
 per metric tonne. The calculation engine normalizes it using the exact relation
 `1 ft3 = 0.028316846592 m3` before applying the cubic-capacity limit.
 
+## Chartering Task Desk
+
+The browser includes an MVP task conversation where a chartering or operations
+user can submit a request in ordinary text. Tasks are sent to the local backend
+and stored under `local-data/chartering-tasks/`, outside Git. The current stage
+queues each task for structured review; a future server-side AI adapter can
+produce the response while the deterministic engine remains responsible for
+the calculation.
+
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software
 (CSV, Excel, PDF, or another supported format), remove confidential fields when

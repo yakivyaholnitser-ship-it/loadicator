@@ -8,6 +8,7 @@ const PORT = Number(process.env.PORT) || 5173;
 const ROOT = fileURLToPath(new URL("../public", import.meta.url));
 const QUESTIONNAIRE_ROOT = fileURLToPath(new URL("../local-data/questionnaires", import.meta.url));
 const ANALYSIS_ROOT = fileURLToPath(new URL("../local-data/questionnaire-analysis", import.meta.url));
+const TASK_ROOT = fileURLToPath(new URL("../local-data/chartering-tasks", import.meta.url));
 const ALLOWED_QUESTIONNAIRE_EXTENSIONS = new Set([".pdf", ".docx", ".xlsx", ".xls"]);
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
@@ -84,6 +85,16 @@ async function latestQuestionnaireAnalysis() {
   return JSON.parse(await readFile(join(ANALYSIS_ROOT, entries[0].name), "utf8"));
 }
 
+async function listTasks() {
+  await mkdir(TASK_ROOT, { recursive: true });
+  const entries = (await readdir(TASK_ROOT, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+    .sort((a, b) => b.name.localeCompare(a.name));
+  return Promise.all(
+    entries.slice(0, 20).map(async (entry) => JSON.parse(await readFile(join(TASK_ROOT, entry.name), "utf8")))
+  );
+}
+
 async function serveStatic(request, response) {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
   const pathname = requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname;
@@ -150,6 +161,29 @@ const server = createServer(async (request, response) => {
       sendJson(response, 201, { file: { originalName, size: content.length } });
     } catch (error) {
       sendJson(response, 400, { error: error.message || "Invalid questionnaire upload" });
+    }
+    return;
+  }
+
+  if (request.method === "GET" && request.url === "/api/tasks") {
+    sendJson(response, 200, { tasks: await listTasks() });
+    return;
+  }
+
+  if (request.method === "POST" && request.url === "/api/tasks") {
+    try {
+      const payload = await readRequestJson(request);
+      const message = typeof payload.message === "string" ? payload.message.trim() : "";
+      if (!message) throw new Error("Task text is required");
+      if (message.length > 10000) throw new Error("Task text exceeds the 10,000 character limit");
+
+      await mkdir(TASK_ROOT, { recursive: true });
+      const createdAt = new Date().toISOString();
+      const task = { id: `${Date.now()}`, createdAt, status: "pending", message, response: null };
+      await writeFile(join(TASK_ROOT, `${task.id}.json`), JSON.stringify(task, null, 2), { flag: "wx" });
+      sendJson(response, 201, { task });
+    } catch (error) {
+      sendJson(response, 400, { error: error.message || "Invalid chartering task" });
     }
     return;
   }

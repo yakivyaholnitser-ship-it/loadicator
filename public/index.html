@@ -58,6 +58,36 @@
           </p>
         </section>
 
+        <section class="panel task-desk" id="task-desk">
+          <div class="task-desk-header">
+            <div>
+              <p class="eyebrow">MVP workflow</p>
+              <h2>Chartering Task Desk</h2>
+            </div>
+            <span class="status-badge">Local workspace</span>
+          </div>
+          <div class="task-thread" id="task-thread" aria-live="polite">
+            <div class="task-empty">
+              Paste a chartering request below. Inputs, assumptions, calculations, and missing data will appear here.
+            </div>
+          </div>
+          <form class="task-composer" id="task-form">
+            <label for="task-message">Chartering request</label>
+            <textarea
+              id="task-message"
+              name="message"
+              rows="6"
+              maxlength="10000"
+              placeholder="Example: Please calculate cargo intake for..."
+              required
+            ></textarea>
+            <div class="task-actions">
+              <small>Stored locally and excluded from GitHub.</small>
+              <button type="submit">Submit task</button>
+            </div>
+          </form>
+        </section>
+
         <section class="panel questionnaire-analysis" id="questionnaire-analysis">
           <div class="analysis-header">
             <div>
