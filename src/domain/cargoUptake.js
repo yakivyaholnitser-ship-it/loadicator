@@ -1,4 +1,5 @@
 const SEA_WATER_DENSITY = 1.025;
+const CUBIC_FEET_TO_CUBIC_METERS = 0.028316846592;
 
 function numberOrZero(value) {
   const number = Number(value);
@@ -10,13 +11,26 @@ function round(value, decimals = 2) {
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
+export function convertStowageFactor(value, fromUnit, toUnit) {
+  const numericValue = numberOrZero(value);
+  if (fromUnit === toUnit) return numericValue;
+  if (fromUnit === "cuft/mt" && toUnit === "cbm/mt") return numericValue * CUBIC_FEET_TO_CUBIC_METERS;
+  if (fromUnit === "cbm/mt" && toUnit === "cuft/mt") return numericValue / CUBIC_FEET_TO_CUBIC_METERS;
+  throw new Error(`Unsupported stowage factor conversion: ${fromUnit} to ${toUnit}`);
+}
+
 export function calculateCargoUptake(input) {
   const summerDeadweightMt = numberOrZero(input.summerDeadweightMt);
   const summerDraftM = numberOrZero(input.summerDraftM);
   const loadPortMaxDraftM = numberOrZero(input.loadPortMaxDraftM);
   const tpcMt = numberOrZero(input.tpcMt);
   const grainCapacityCbm = numberOrZero(input.grainCapacityCbm);
-  const stowageFactorCbmPerMt = numberOrZero(input.stowageFactorCbmPerMt);
+  const hasUnitBasedStowageFactor = input.stowageFactor !== undefined;
+  const stowageFactorInput = hasUnitBasedStowageFactor
+    ? numberOrZero(input.stowageFactor)
+    : numberOrZero(input.stowageFactorCbmPerMt);
+  const stowageFactorUnit = hasUnitBasedStowageFactor ? input.stowageFactorUnit || "cuft/mt" : "cbm/mt";
+  const stowageFactorCbmPerMt = convertStowageFactor(stowageFactorInput, stowageFactorUnit, "cbm/mt");
   const hasSplitFuel = input.heavyFuelOilMt !== undefined || input.dieselOilMt !== undefined;
   const heavyFuelOilMt = numberOrZero(input.heavyFuelOilMt);
   const dieselOilMt = numberOrZero(input.dieselOilMt);
@@ -66,6 +80,12 @@ export function calculateCargoUptake(input) {
     heavyFuelOilMt: round(heavyFuelOilMt, 2),
     dieselOilMt: round(dieselOilMt, 2),
     unpumpableBallastMt: round(unpumpableBallastMt, 2),
+    stowageFactor: {
+      input: round(stowageFactorInput, 4),
+      inputUnit: stowageFactorUnit,
+      cbmPerMt: round(stowageFactorCbmPerMt, 6),
+      cuftPerMt: round(convertStowageFactor(stowageFactorCbmPerMt, "cbm/mt", "cuft/mt"), 4)
+    },
     assumptions: {
       waterDensity,
       note: "Pre-fixture estimate only. Final loading requires vessel-approved stability and strength checks."

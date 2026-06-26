@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { calculateCargoUptake } from "../src/domain/cargoUptake.js";
+import { calculateCargoUptake, convertStowageFactor } from "../src/domain/cargoUptake.js";
 
 test("calculates draft-limited cargo uptake", () => {
   const result = calculateCargoUptake({
@@ -71,4 +71,23 @@ test("combines Panamax standard HFO and diesel oil as bunkers", () => {
   assert.equal(result.bunkersMt, 1250);
   assert.equal(result.deductionsMt, 2000);
   assert.equal(result.maxCargoMt, 80000);
+});
+
+test("converts stowage factor in both directions", () => {
+  assert.equal(convertStowageFactor(1, "cuft/mt", "cbm/mt"), 0.028316846592);
+  assert.equal(Math.round(convertStowageFactor(1, "cbm/mt", "cuft/mt") * 1e9) / 1e9, 35.314666721);
+});
+
+test("uses cubic feet per metric tonne for the cubic cargo limit", () => {
+  const result = calculateCargoUptake({
+    summerDeadweightMt: 100000,
+    summerDraftM: 15,
+    loadPortMaxDraftM: 15,
+    grainCapacityCbm: 97000,
+    stowageFactor: 45,
+    stowageFactorUnit: "cuft/mt"
+  });
+
+  assert.equal(result.stowageFactor.cbmPerMt, 1.274258);
+  assert.equal(result.cubicLimitedCargoMt, 76122.73);
 });

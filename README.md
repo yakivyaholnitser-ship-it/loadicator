@@ -71,6 +71,10 @@ For baseline PMX/KMX work, use these editable assumptions:
 The browser stores the last edited standard set locally and can apply it to the
 current cargo scenario. HFO and diesel oil are combined as bunker deductions.
 
+Cargo stowage factor accepts either cubic feet per metric tonne or cubic metres
+per metric tonne. The calculation engine normalizes it using the exact relation
+`1 ft3 = 0.028316846592 m3` before applying the cubic-capacity limit.
+
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software
 (CSV, Excel, PDF, or another supported format), remove confidential fields when

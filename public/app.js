@@ -9,7 +9,12 @@ const analysisNotes = document.querySelector("#analysis-notes");
 const standardsPanel = document.querySelector("#panamax-standards");
 const applyStandardsButton = document.querySelector("#apply-standards");
 const standardsNote = document.querySelector("#standards-note");
+const stowageFactorInput = form.querySelector('input[name="stowageFactor"]');
+const stowageFactorUnit = form.querySelector('select[name="stowageFactorUnit"]');
+const stowageFactorConversion = document.querySelector("#stowage-factor-conversion");
 const STANDARDS_STORAGE_KEY = "loadicator.panamaxStandards";
+const CUBIC_FEET_TO_CUBIC_METERS = 0.028316846592;
+let previousStowageFactorUnit = stowageFactorUnit.value;
 const analysisLists = {
   particulars: document.querySelector("#particulars-analysis"),
   cargoSpaces: document.querySelector("#capacity-analysis"),
@@ -156,8 +161,39 @@ function formatMt(value) {
 }
 
 function readFormData() {
-  return readNumericInputs(form);
+  return {
+    ...readNumericInputs(form),
+    stowageFactorUnit: stowageFactorUnit.value
+  };
 }
+
+function renderStowageFactorConversion() {
+  const value = Number(stowageFactorInput.value);
+  if (!Number.isFinite(value)) {
+    stowageFactorConversion.textContent = "";
+    return;
+  }
+
+  if (stowageFactorUnit.value === "cuft/mt") {
+    stowageFactorConversion.textContent = `= ${(value * CUBIC_FEET_TO_CUBIC_METERS).toFixed(4)} m³/mt`;
+  } else {
+    stowageFactorConversion.textContent = `= ${(value / CUBIC_FEET_TO_CUBIC_METERS).toFixed(2)} ft³/mt`;
+  }
+}
+
+stowageFactorInput.addEventListener("input", renderStowageFactorConversion);
+stowageFactorUnit.addEventListener("change", () => {
+  const value = Number(stowageFactorInput.value);
+  if (Number.isFinite(value) && previousStowageFactorUnit !== stowageFactorUnit.value) {
+    const converted =
+      stowageFactorUnit.value === "cbm/mt"
+        ? value * CUBIC_FEET_TO_CUBIC_METERS
+        : value / CUBIC_FEET_TO_CUBIC_METERS;
+    stowageFactorInput.value = converted.toFixed(stowageFactorUnit.value === "cbm/mt" ? 6 : 3);
+  }
+  previousStowageFactorUnit = stowageFactorUnit.value;
+  renderStowageFactorConversion();
+});
 
 function renderResult(data) {
   const factors = data.limitingFactors.length ? data.limitingFactors.join(", ") : "none";
@@ -217,3 +253,4 @@ form.addEventListener("submit", async (event) => {
 loadUploads();
 loadAnalysis();
 loadPanamaxStandards();
+renderStowageFactorConversion();
