@@ -45,8 +45,8 @@ function renderTasks(tasks) {
     messages.push(
       taskBubble(
         "assistant",
-        task.response || "Task received. Structured analysis is pending.",
-        task.response ? "Loadicator analysis" : "Pending analysis"
+        task.response || "Task saved locally. No background AI processor is connected yet.",
+        task.response ? "Loadicator analysis" : "Queued for manual review"
       )
     );
   }

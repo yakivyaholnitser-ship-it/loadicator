@@ -82,7 +82,8 @@ user can submit a request in ordinary text. Tasks are sent to the local backend
 and stored under `local-data/chartering-tasks/`, outside Git. The current stage
 queues each task for structured review; a future server-side AI adapter can
 produce the response while the deterministic engine remains responsible for
-the calculation.
+the calculation. Until that adapter is connected, the UI explicitly labels
+submitted tasks as queued for manual review rather than background processing.
 
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software
