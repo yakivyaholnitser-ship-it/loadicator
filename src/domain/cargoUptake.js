@@ -20,9 +20,10 @@ export function calculateCargoUptake(input) {
   const bunkersMt = numberOrZero(input.bunkersMt);
   const constantsMt = numberOrZero(input.constantsMt);
   const freshwaterMt = numberOrZero(input.freshwaterMt);
+  const unpumpableBallastMt = numberOrZero(input.unpumpableBallastMt);
   const waterDensity = numberOrZero(input.waterDensity) || SEA_WATER_DENSITY;
 
-  const deductionsMt = bunkersMt + constantsMt + freshwaterMt;
+  const deductionsMt = bunkersMt + constantsMt + freshwaterMt + unpumpableBallastMt;
   const deadweightLimitedCargoMt = Math.max(summerDeadweightMt - deductionsMt, 0);
 
   const draftGapM = loadPortMaxDraftM > 0 ? loadPortMaxDraftM - summerDraftM : 0;
@@ -58,6 +59,7 @@ export function calculateCargoUptake(input) {
     draftLimitedCargoMt: round(draftLimitedCargoMt, 2),
     cubicLimitedCargoMt: Number.isFinite(cubicLimitedCargoMt) ? round(cubicLimitedCargoMt, 2) : null,
     deductionsMt: round(deductionsMt, 2),
+    unpumpableBallastMt: round(unpumpableBallastMt, 2),
     assumptions: {
       waterDensity,
       note: "Pre-fixture estimate only. Final loading requires vessel-approved stability and strength checks."

@@ -51,10 +51,10 @@ field extraction will be added against representative questionnaires.
 Reviewed results can be stored locally in `local-data/questionnaire-analysis/`
 and displayed in the temporary Questionnaire Analysis panel.
 
-Unpumpable or non-pumpable ballast is a mandatory extraction target. Preserve
-the stated quantity and unit from the questionnaire; when it is reported as a
-volume, convert it to mass using the applicable ballast-water density before
-using it as a cargo-uptake deduction.
+Unpumpable or non-pumpable ballast is a mandatory extraction target. Under the
+team's chartering convention, its questionnaire quantity is always normalized
+to metric tonnes, even when the source labels it as cubic metres. Deduct that
+quantity directly from cargo uptake without a water-density conversion.
 
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software

@@ -37,3 +37,20 @@ test("calculates cubic-limited cargo uptake", () => {
   assert.equal(result.maxCargoMt, 33333.33);
   assert.deepEqual(result.limitingFactors, ["cubic"]);
 });
+
+test("deducts unpumpable ballast as metric tonnes", () => {
+  const result = calculateCargoUptake({
+    summerDeadweightMt: 82000,
+    summerDraftM: 14.45,
+    loadPortMaxDraftM: 14.45,
+    tpcMt: 67,
+    bunkersMt: 900,
+    constantsMt: 300,
+    freshwaterMt: 120,
+    unpumpableBallastMt: 200
+  });
+
+  assert.equal(result.deductionsMt, 1520);
+  assert.equal(result.unpumpableBallastMt, 200);
+  assert.equal(result.maxCargoMt, 80480);
+});

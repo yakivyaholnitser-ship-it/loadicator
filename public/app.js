@@ -155,6 +155,10 @@ function renderResult(data) {
         <dt>Deductions</dt>
         <dd>${formatMt(data.deductionsMt)}</dd>
       </div>
+      <div class="result-row">
+        <dt>Including unpumpable ballast</dt>
+        <dd>${formatMt(data.unpumpableBallastMt)}</dd>
+      </div>
     </dl>
     <p class="notice">${data.assumptions.note}</p>
   `;
