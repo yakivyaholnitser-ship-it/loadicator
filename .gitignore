@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+.env
+.env.local
+coverage/
+dist/
+tmp/
+
+# Local vessel documents, licensed software exports, and confidential fixtures.
+local-data/
+private-data/
+*.lic
+*.license

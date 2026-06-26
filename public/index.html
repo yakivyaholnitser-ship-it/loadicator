@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loadicator</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <div class="panel intro">
+          <p class="eyebrow">Dry bulk chartering workspace</p>
+          <h1>Loadicator</h1>
+          <p>
+            Quick cargo uptake estimates for pre-fixture checks. The math is deterministic; the AI layer can come next.
+          </p>
+        </div>
+
+        <form class="panel calculator" id="uptake-form">
+          <div class="form-header">
+            <div>
+              <p class="eyebrow">Scenario</p>
+              <h2>Cargo Uptake</h2>
+            </div>
+            <button type="submit">Calculate</button>
+          </div>
+
+          <div class="grid">
+            <label>
+              Summer DWT mt
+              <input name="summerDeadweightMt" type="number" step="0.01" value="82000" />
+            </label>
+            <label>
+              Summer draft m
+              <input name="summerDraftM" type="number" step="0.01" value="14.45" />
+            </label>
+            <label>
+              Load port max draft m
+              <input name="loadPortMaxDraftM" type="number" step="0.01" value="13.6" />
+            </label>
+            <label>
+              TPC mt/cm
+              <input name="tpcMt" type="number" step="0.01" value="67" />
+            </label>
+            <label>
+              Grain capacity cbm
+              <input name="grainCapacityCbm" type="number" step="0.01" value="97000" />
+            </label>
+            <label>
+              Cargo SF cbm/mt
+              <input name="stowageFactorCbmPerMt" type="number" step="0.001" value="1.25" />
+            </label>
+            <label>
+              Bunkers mt
+              <input name="bunkersMt" type="number" step="0.01" value="900" />
+            </label>
+            <label>
+              Constants mt
+              <input name="constantsMt" type="number" step="0.01" value="300" />
+            </label>
+            <label>
+              Fresh water mt
+              <input name="freshwaterMt" type="number" step="0.01" value="120" />
+            </label>
+            <label>
+              Water density
+              <input name="waterDensity" type="number" step="0.001" value="1.025" />
+            </label>
+          </div>
+        </form>
+
+        <section class="panel result" id="result" aria-live="polite">
+          <p class="eyebrow">Result</p>
+          <h2>Ready to calculate</h2>
+          <p>Enter a scenario and run the estimate.</p>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
