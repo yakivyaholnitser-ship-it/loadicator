@@ -4,6 +4,9 @@ import { basename, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { calculateCargoUptake } from "./domain/cargoUptake.js";
 import { analyzeCharteringTask, isOpenAiConfigured } from "./ai/openaiTaskAnalyzer.js";
+import { loadLocalEnv } from "./config/loadEnv.js";
+
+await loadLocalEnv();
 
 const PORT = Number(process.env.PORT) || 5173;
 const ROOT = fileURLToPath(new URL("../public", import.meta.url));

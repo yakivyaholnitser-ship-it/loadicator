@@ -89,15 +89,19 @@ submitted tasks as queued for manual review rather than background processing.
 
 The Task Desk can use the OpenAI Responses API to extract structured inputs from
 ordinary chartering text. Calculation rules remain in the deterministic engine.
-Set the key only in the server environment; never add it to browser code or Git:
+Set the key only in the local backend file; never add it to browser code or Git.
+Open `.env.local` and fill in:
 
-```bash
-OPENAI_API_KEY="your-key" npm run dev
+```dotenv
+OPENAI_API_KEY=your-key
+OPENAI_MODEL=gpt-5.4-mini
 ```
 
-Optionally set `OPENAI_MODEL`; the default is `gpt-5.4-mini`. Without a key, the
-Task Desk remains in manual-review mode. The server sends `store: false` on task
-analysis requests.
+Then restart `npm run dev`. The real `.env.local` file is ignored by Git;
+`.env.example` documents the required settings for other developers. An
+environment variable still takes precedence over the local file. Without a key,
+the Task Desk remains in manual-review mode. The server sends `store: false` on
+task analysis requests.
 
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software
