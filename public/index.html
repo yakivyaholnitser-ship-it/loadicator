@@ -17,6 +17,23 @@
           </p>
         </div>
 
+        <section class="panel importer">
+          <p class="eyebrow">Vessel data</p>
+          <h2>Baltic Questionnaire</h2>
+          <p>Upload a PDF, Word, or Excel questionnaire for local review and field extraction.</p>
+          <label class="file-picker" for="questionnaire-file">
+            <span>Select questionnaire</span>
+            <small>PDF, DOCX, XLSX, or XLS up to 25 MB</small>
+            <input
+              id="questionnaire-file"
+              type="file"
+              accept=".pdf,.docx,.xlsx,.xls"
+            />
+          </label>
+          <div class="upload-status" id="upload-status" aria-live="polite"></div>
+          <ul class="upload-list" id="upload-list"></ul>
+        </section>
+
         <form class="panel calculator" id="uptake-form">
           <div class="form-header">
             <div>

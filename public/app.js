@@ -1,5 +1,66 @@
 const form = document.querySelector("#uptake-form");
 const result = document.querySelector("#result");
+const questionnaireFile = document.querySelector("#questionnaire-file");
+const uploadStatus = document.querySelector("#upload-status");
+const uploadList = document.querySelector("#upload-list");
+
+function formatFileSize(bytes) {
+  if (bytes < 1024 * 1024) {
+    return `${Math.max(Math.round(bytes / 1024), 1)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function renderUploads(files) {
+  uploadList.replaceChildren(
+    ...files.map((file) => {
+      const item = document.createElement("li");
+      const name = document.createElement("span");
+      const size = document.createElement("small");
+      name.textContent = file.originalName;
+      size.textContent = formatFileSize(file.size);
+      item.append(name, size);
+      return item;
+    })
+  );
+}
+
+async function loadUploads() {
+  const response = await fetch("/api/questionnaires");
+  if (response.ok) {
+    renderUploads((await response.json()).files);
+  }
+}
+
+questionnaireFile.addEventListener("change", async () => {
+  const [file] = questionnaireFile.files;
+  if (!file) return;
+
+  uploadStatus.classList.remove("error");
+  uploadStatus.textContent = `Uploading ${file.name}...`;
+
+  try {
+    const response = await fetch("/api/questionnaires", {
+      method: "POST",
+      headers: {
+        "content-type": file.type || "application/octet-stream",
+        "x-file-name": encodeURIComponent(file.name)
+      },
+      body: file
+    });
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error || "Upload failed");
+
+    uploadStatus.textContent = `${file.name} is ready for review.`;
+    questionnaireFile.value = "";
+    await loadUploads();
+  } catch (error) {
+    uploadStatus.classList.add("error");
+    uploadStatus.textContent = error.message;
+  }
+});
 
 function formatMt(value) {
   return `${Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })} mt`;
@@ -61,3 +122,5 @@ form.addEventListener("submit", async (event) => {
 
   renderResult(await response.json());
 });
+
+loadUploads();

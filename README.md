@@ -5,6 +5,7 @@ Workspace for an AI-assisted dry bulk cargo uptake tool for chartering teams.
 This first version is intentionally small:
 
 - deterministic cargo uptake calculation engine;
+- local Baltic Questionnaire inbox for PDF, Word, and Excel files;
 - local Node.js server;
 - browser UI for quick scenario checks;
 - room to add vessel/cargo databases and AI parsing later.
@@ -43,6 +44,10 @@ Do not commit licensed loadicator installations, licence keys, fixture data, or
 confidential vessel documents. Put local working material in `local-data/` or
 `private-data/`; both directories are ignored by Git. Sanitized vessel examples
 may later be added under a dedicated test-fixtures directory.
+
+Questionnaires uploaded in the browser are stored in
+`local-data/questionnaires/`. Upload currently stages files for review; automatic
+field extraction will be added against representative questionnaires.
 
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software

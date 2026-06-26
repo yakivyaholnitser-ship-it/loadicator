@@ -1,11 +1,14 @@
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
-import { extname, join, normalize } from "node:path";
+import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { basename, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { calculateCargoUptake } from "./domain/cargoUptake.js";
 
 const PORT = Number(process.env.PORT) || 5173;
 const ROOT = fileURLToPath(new URL("../public", import.meta.url));
+const QUESTIONNAIRE_ROOT = fileURLToPath(new URL("../local-data/questionnaires", import.meta.url));
+const ALLOWED_QUESTIONNAIRE_EXTENSIONS = new Set([".pdf", ".docx", ".xlsx", ".xls"]);
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -28,6 +31,46 @@ async function readRequestJson(request) {
   }
 
   return body ? JSON.parse(body) : {};
+}
+
+async function readRequestBuffer(request, maxBytes) {
+  const chunks = [];
+  let totalBytes = 0;
+
+  for await (const chunk of request) {
+    totalBytes += chunk.length;
+    if (totalBytes > maxBytes) throw new Error("File exceeds the 25 MB limit");
+    chunks.push(chunk);
+  }
+
+  return Buffer.concat(chunks);
+}
+
+function questionnaireName(request) {
+  const encodedName = request.headers["x-file-name"];
+  if (!encodedName || Array.isArray(encodedName)) throw new Error("File name is missing");
+
+  const originalName = basename(decodeURIComponent(encodedName)).replace(/[\u0000-\u001f]/g, "");
+  const extension = extname(originalName).toLowerCase();
+  if (!originalName || !ALLOWED_QUESTIONNAIRE_EXTENSIONS.has(extension)) {
+    throw new Error("Supported formats: PDF, DOCX, XLSX, and XLS");
+  }
+
+  return { originalName, extension };
+}
+
+async function listQuestionnaires() {
+  await mkdir(QUESTIONNAIRE_ROOT, { recursive: true });
+  const entries = await readdir(QUESTIONNAIRE_ROOT, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.filter((entry) => entry.isFile()).map(async (entry) => {
+      const fileStat = await stat(join(QUESTIONNAIRE_ROOT, entry.name));
+      const originalName = entry.name.replace(/^\d+-/, "");
+      return { originalName, size: fileStat.size, uploadedAt: fileStat.mtime.toISOString() };
+    })
+  );
+
+  return files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt));
 }
 
 async function serveStatic(request, response) {
@@ -65,6 +108,28 @@ const server = createServer(async (request, response) => {
       sendJson(response, 400, { error: error.message || "Invalid uptake request" });
     }
 
+    return;
+  }
+
+  if (request.method === "GET" && request.url === "/api/questionnaires") {
+    sendJson(response, 200, { files: await listQuestionnaires() });
+    return;
+  }
+
+  if (request.method === "POST" && request.url === "/api/questionnaires") {
+    try {
+      const { originalName } = questionnaireName(request);
+      const content = await readRequestBuffer(request, MAX_UPLOAD_BYTES);
+      if (!content.length) throw new Error("The selected file is empty");
+
+      await mkdir(QUESTIONNAIRE_ROOT, { recursive: true });
+      const safeName = originalName.replace(/[<>:"/\\|?*]/g, "_");
+      const storedName = `${Date.now()}-${safeName}`;
+      await writeFile(join(QUESTIONNAIRE_ROOT, storedName), content, { flag: "wx" });
+      sendJson(response, 201, { file: { originalName, size: content.length } });
+    } catch (error) {
+      sendJson(response, 400, { error: error.message || "Invalid questionnaire upload" });
+    }
     return;
   }
 

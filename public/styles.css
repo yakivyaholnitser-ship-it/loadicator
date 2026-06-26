@@ -86,6 +86,81 @@ p {
   grid-row: span 2;
 }
 
+.importer h2 {
+  margin-bottom: 10px;
+}
+
+.file-picker {
+  border: 1px dashed #91a6ad;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 16px;
+}
+
+.file-picker:hover {
+  border-color: var(--accent);
+  background: #f4fbfa;
+}
+
+.file-picker span,
+.file-picker small {
+  display: block;
+}
+
+.file-picker span {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.file-picker small {
+  font-weight: 500;
+}
+
+.file-picker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.upload-status {
+  min-height: 20px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.upload-status.error {
+  color: #a12b20;
+}
+
+.upload-list {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.upload-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.upload-list small {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
 .form-header {
   display: flex;
   align-items: center;
