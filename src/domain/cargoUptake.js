@@ -39,14 +39,16 @@ export function calculateCargoUptake(input) {
   const freshwaterMt = numberOrZero(input.freshwaterMt);
   const unpumpableBallastMt = numberOrZero(input.unpumpableBallastMt);
   const waterDensity = numberOrZero(input.waterDensity) || SEA_WATER_DENSITY;
+  const fwaMm = numberOrZero(input.fwaMm);
 
   const deductionsMt = bunkersMt + constantsMt + freshwaterMt + unpumpableBallastMt;
   const deadweightLimitedCargoMt = Math.max(summerDeadweightMt - deductionsMt, 0);
 
   const draftGapM = loadPortMaxDraftM > 0 ? loadPortMaxDraftM - summerDraftM : 0;
   const draftAdjustmentMt = tpcMt > 0 ? draftGapM * 100 * tpcMt : 0;
-  const densityAdjustmentMt =
-    summerDeadweightMt > 0 ? summerDeadweightMt * ((waterDensity - SEA_WATER_DENSITY) / SEA_WATER_DENSITY) : 0;
+  const densityDifference = SEA_WATER_DENSITY - waterDensity;
+  const dockWaterAllowanceMm = fwaMm > 0 ? fwaMm * (densityDifference / 0.025) : 0;
+  const densityAdjustmentMt = fwaMm > 0 && tpcMt > 0 ? -(dockWaterAllowanceMm / 10) * tpcMt : 0;
   const draftLimitedCargoMt = Math.max(summerDeadweightMt + draftAdjustmentMt + densityAdjustmentMt - deductionsMt, 0);
 
   const cubicLimitedCargoMt =
@@ -80,6 +82,8 @@ export function calculateCargoUptake(input) {
     heavyFuelOilMt: round(heavyFuelOilMt, 2),
     dieselOilMt: round(dieselOilMt, 2),
     unpumpableBallastMt: round(unpumpableBallastMt, 2),
+    densityAdjustmentMt: round(densityAdjustmentMt, 2),
+    dockWaterAllowanceMm: round(dockWaterAllowanceMm, 2),
     stowageFactor: {
       input: round(stowageFactorInput, 4),
       inputUnit: stowageFactorUnit,
@@ -88,7 +92,11 @@ export function calculateCargoUptake(input) {
     },
     assumptions: {
       waterDensity,
-      note: "Pre-fixture estimate only. Final loading requires vessel-approved stability and strength checks."
+      densityCorrectionApplied: densityDifference === 0 || fwaMm > 0,
+      note:
+        densityDifference !== 0 && fwaMm <= 0
+          ? "Density differs from seawater, but FWA is missing. Density correction was not applied."
+          : "Pre-fixture estimate only. Final loading requires vessel-approved stability and strength checks."
     }
   };
 }

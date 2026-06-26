@@ -85,6 +85,20 @@ produce the response while the deterministic engine remains responsible for
 the calculation. Until that adapter is connected, the UI explicitly labels
 submitted tasks as queued for manual review rather than background processing.
 
+## OpenAI Setup
+
+The Task Desk can use the OpenAI Responses API to extract structured inputs from
+ordinary chartering text. Calculation rules remain in the deterministic engine.
+Set the key only in the server environment; never add it to browser code or Git:
+
+```bash
+OPENAI_API_KEY="your-key" npm run dev
+```
+
+Optionally set `OPENAI_MODEL`; the default is `gpt-5.4-mini`. Without a key, the
+Task Desk remains in manual-review mode. The server sends `store: false` on task
+analysis requests.
+
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software
 (CSV, Excel, PDF, or another supported format), remove confidential fields when

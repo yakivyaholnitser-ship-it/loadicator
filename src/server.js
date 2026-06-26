@@ -3,6 +3,7 @@ import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { basename, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { calculateCargoUptake } from "./domain/cargoUptake.js";
+import { analyzeCharteringTask, isOpenAiConfigured } from "./ai/openaiTaskAnalyzer.js";
 
 const PORT = Number(process.env.PORT) || 5173;
 const ROOT = fileURLToPath(new URL("../public", import.meta.url));
@@ -122,6 +123,14 @@ const server = createServer(async (request, response) => {
     return;
   }
 
+  if (request.method === "GET" && request.url === "/api/ai/status") {
+    sendJson(response, 200, {
+      configured: isOpenAiConfigured(),
+      model: process.env.OPENAI_MODEL || "gpt-5.4-mini"
+    });
+    return;
+  }
+
   if (request.method === "POST" && request.url === "/api/uptake") {
     try {
       const payload = await readRequestJson(request);
@@ -179,8 +188,23 @@ const server = createServer(async (request, response) => {
 
       await mkdir(TASK_ROOT, { recursive: true });
       const createdAt = new Date().toISOString();
-      const task = { id: `${Date.now()}`, createdAt, status: "pending", message, response: null };
-      await writeFile(join(TASK_ROOT, `${task.id}.json`), JSON.stringify(task, null, 2), { flag: "wx" });
+      let task = { id: `${Date.now()}`, createdAt, status: "pending", message, response: null };
+      const taskPath = join(TASK_ROOT, `${task.id}.json`);
+      await writeFile(taskPath, JSON.stringify(task, null, 2), { flag: "wx" });
+
+      if (isOpenAiConfigured()) {
+        try {
+          task = {
+            ...task,
+            status: "completed",
+            ...(await analyzeCharteringTask(message, await latestQuestionnaireAnalysis()))
+          };
+          await writeFile(taskPath, JSON.stringify(task, null, 2));
+        } catch (error) {
+          task = { ...task, status: "error", processingError: error.message };
+          await writeFile(taskPath, JSON.stringify(task, null, 2));
+        }
+      }
       sendJson(response, 201, { task });
     } catch (error) {
       sendJson(response, 400, { error: error.message || "Invalid chartering task" });

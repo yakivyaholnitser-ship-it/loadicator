@@ -15,6 +15,7 @@ const stowageFactorConversion = document.querySelector("#stowage-factor-conversi
 const taskForm = document.querySelector("#task-form");
 const taskMessage = document.querySelector("#task-message");
 const taskThread = document.querySelector("#task-thread");
+const aiStatus = document.querySelector("#ai-status");
 const STANDARDS_STORAGE_KEY = "loadicator.panamaxStandards";
 const CUBIC_FEET_TO_CUBIC_METERS = 0.028316846592;
 let previousStowageFactorUnit = stowageFactorUnit.value;
@@ -57,6 +58,14 @@ function renderTasks(tasks) {
 async function loadTasks() {
   const response = await fetch("/api/tasks");
   if (response.ok) renderTasks((await response.json()).tasks);
+}
+
+async function loadAiStatus() {
+  const response = await fetch("/api/ai/status");
+  if (!response.ok) return;
+  const status = await response.json();
+  aiStatus.textContent = status.configured ? `AI ready · ${status.model}` : "Manual mode · API key missing";
+  aiStatus.classList.toggle("reviewed", status.configured);
 }
 
 taskForm.addEventListener("submit", async (event) => {
@@ -318,3 +327,4 @@ loadAnalysis();
 loadPanamaxStandards();
 renderStowageFactorConversion();
 loadTasks();
+loadAiStatus();

@@ -91,3 +91,43 @@ test("uses cubic feet per metric tonne for the cubic cargo limit", () => {
   assert.equal(result.stowageFactor.cbmPerMt, 1.274258);
   assert.equal(result.cubicLimitedCargoMt, 76122.73);
 });
+
+test("applies dock water allowance for brackish water", () => {
+  const result = calculateCargoUptake({
+    summerDeadweightMt: 81894.8,
+    summerDraftM: 14.467,
+    loadPortMaxDraftM: 11,
+    tpcMt: 72,
+    fwaMm: 331,
+    waterDensity: 1.01,
+    heavyFuelOilMt: 1000,
+    dieselOilMt: 250,
+    constantsMt: 420,
+    freshwaterMt: 200,
+    unpumpableBallastMt: 200
+  });
+
+  assert.equal(result.dockWaterAllowanceMm, 198.6);
+  assert.equal(result.densityAdjustmentMt, -1429.92);
+  assert.equal(result.maxCargoMt, 53432.48);
+});
+
+test("extrapolates dock water allowance for density below fresh water", () => {
+  const result = calculateCargoUptake({
+    summerDeadweightMt: 81894.8,
+    summerDraftM: 14.467,
+    loadPortMaxDraftM: 11,
+    tpcMt: 72,
+    fwaMm: 331,
+    waterDensity: 0.997,
+    heavyFuelOilMt: 1000,
+    dieselOilMt: 250,
+    constantsMt: 420,
+    freshwaterMt: 200,
+    unpumpableBallastMt: 200
+  });
+
+  assert.equal(result.dockWaterAllowanceMm, 370.72);
+  assert.equal(result.densityAdjustmentMt, -2669.18);
+  assert.equal(result.maxCargoMt, 52193.22);
+});
