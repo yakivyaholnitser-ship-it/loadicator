@@ -3,6 +3,60 @@ const result = document.querySelector("#result");
 const questionnaireFile = document.querySelector("#questionnaire-file");
 const uploadStatus = document.querySelector("#upload-status");
 const uploadList = document.querySelector("#upload-list");
+const analysisStatus = document.querySelector("#analysis-status");
+const analysisSummary = document.querySelector("#analysis-summary");
+const analysisNotes = document.querySelector("#analysis-notes");
+const analysisLists = {
+  particulars: document.querySelector("#particulars-analysis"),
+  cargoSpaces: document.querySelector("#capacity-analysis"),
+  tankCapacities: document.querySelector("#tank-analysis"),
+  voyageInputs: document.querySelector("#voyage-analysis")
+};
+
+function renderAnalysisItems(list, items) {
+  list.replaceChildren(
+    ...items.map((item) => {
+      const row = document.createElement("div");
+      const label = document.createElement("dt");
+      const value = document.createElement("dd");
+      label.textContent = item.label;
+      value.textContent = item.value;
+      if (item.source) {
+        const source = document.createElement("small");
+        source.textContent = item.source;
+        value.append(source);
+      }
+      row.append(label, value);
+      return row;
+    })
+  );
+}
+
+function renderAnalysis(analysis) {
+  analysisStatus.textContent = "Reviewed";
+  analysisStatus.className = "status-badge reviewed";
+  analysisSummary.textContent = analysis.summary;
+  analysisNotes.textContent = analysis.notes.join(" ");
+  for (const [group, items] of Object.entries(analysis.groups)) {
+    renderAnalysisItems(analysisLists[group], items);
+  }
+}
+
+function markAnalysisPending(fileName) {
+  analysisStatus.textContent = "Pending review";
+  analysisStatus.className = "status-badge pending";
+  analysisSummary.textContent = `${fileName} was uploaded. Structured extraction has not been reviewed yet.`;
+  analysisNotes.textContent =
+    "The file is stored locally. Found, calculated, and missing values will appear here after review.";
+  for (const list of Object.values(analysisLists)) {
+    renderAnalysisItems(list, [{ label: "Questionnaire", value: "Pending review" }]);
+  }
+}
+
+async function loadAnalysis() {
+  const response = await fetch("/api/questionnaires/analysis");
+  if (response.ok) renderAnalysis((await response.json()).analysis);
+}
 
 function formatFileSize(bytes) {
   if (bytes < 1024 * 1024) {
@@ -54,6 +108,7 @@ questionnaireFile.addEventListener("change", async () => {
     if (!response.ok) throw new Error(data.error || "Upload failed");
 
     uploadStatus.textContent = `${file.name} is ready for review.`;
+    markAnalysisPending(file.name);
     questionnaireFile.value = "";
     await loadUploads();
   } catch (error) {
@@ -124,3 +179,4 @@ form.addEventListener("submit", async (event) => {
 });
 
 loadUploads();
+loadAnalysis();

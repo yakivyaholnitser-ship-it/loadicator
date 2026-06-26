@@ -7,6 +7,7 @@ import { calculateCargoUptake } from "./domain/cargoUptake.js";
 const PORT = Number(process.env.PORT) || 5173;
 const ROOT = fileURLToPath(new URL("../public", import.meta.url));
 const QUESTIONNAIRE_ROOT = fileURLToPath(new URL("../local-data/questionnaires", import.meta.url));
+const ANALYSIS_ROOT = fileURLToPath(new URL("../local-data/questionnaire-analysis", import.meta.url));
 const ALLOWED_QUESTIONNAIRE_EXTENSIONS = new Set([".pdf", ".docx", ".xlsx", ".xls"]);
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
@@ -73,6 +74,16 @@ async function listQuestionnaires() {
   return files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt));
 }
 
+async function latestQuestionnaireAnalysis() {
+  await mkdir(ANALYSIS_ROOT, { recursive: true });
+  const entries = (await readdir(ANALYSIS_ROOT, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+    .sort((a, b) => b.name.localeCompare(a.name));
+
+  if (!entries.length) return null;
+  return JSON.parse(await readFile(join(ANALYSIS_ROOT, entries[0].name), "utf8"));
+}
+
 async function serveStatic(request, response) {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
   const pathname = requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname;
@@ -113,6 +124,16 @@ const server = createServer(async (request, response) => {
 
   if (request.method === "GET" && request.url === "/api/questionnaires") {
     sendJson(response, 200, { files: await listQuestionnaires() });
+    return;
+  }
+
+  if (request.method === "GET" && request.url === "/api/questionnaires/analysis") {
+    const analysis = await latestQuestionnaireAnalysis();
+    if (!analysis) {
+      sendJson(response, 404, { error: "No questionnaire has been reviewed yet" });
+      return;
+    }
+    sendJson(response, 200, { analysis });
     return;
   }
 

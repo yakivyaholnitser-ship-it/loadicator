@@ -48,6 +48,8 @@ may later be added under a dedicated test-fixtures directory.
 Questionnaires uploaded in the browser are stored in
 `local-data/questionnaires/`. Upload currently stages files for review; automatic
 field extraction will be added against representative questionnaires.
+Reviewed results can be stored locally in `local-data/questionnaire-analysis/`
+and displayed in the temporary Questionnaire Analysis panel.
 
 For Windows-only loadicator integration, keep a small adapter program on the
 Windows machine. It should read an export produced by the licensed software

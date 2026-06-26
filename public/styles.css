@@ -83,7 +83,16 @@ p {
 }
 
 .calculator {
-  grid-row: span 2;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.result {
+  grid-column: 1 / -1;
+}
+
+.importer {
+  align-self: start;
 }
 
 .importer h2 {
@@ -159,6 +168,95 @@ p {
 .upload-list small {
   flex: 0 0 auto;
   color: var(--muted);
+}
+
+.questionnaire-analysis {
+  grid-column: 1 / -1;
+}
+
+.analysis-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.status-badge {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f7f9fa;
+  color: var(--muted);
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 9px;
+}
+
+.status-badge.pending {
+  border-color: #d9b66f;
+  background: #fff8e8;
+  color: var(--warn);
+}
+
+.status-badge.reviewed {
+  border-color: #88bcb1;
+  background: #edf8f5;
+  color: var(--accent-dark);
+}
+
+.analysis-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 28px;
+  margin-top: 22px;
+}
+
+.analysis-groups h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.analysis-list {
+  margin: 0;
+}
+
+.analysis-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding: 9px 0;
+  font-size: 13px;
+}
+
+.analysis-list dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.analysis-list dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 800;
+}
+
+.analysis-list dd small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.analysis-notes {
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+  padding-top: 14px;
+  font-size: 13px;
+}
+
+.analysis-notes p {
+  margin: 5px 0 0;
 }
 
 .form-header {
@@ -254,12 +352,19 @@ input:focus {
   }
 
   .workspace,
-  .grid {
+  .grid,
+  .analysis-groups {
     grid-template-columns: 1fr;
   }
 
   .calculator {
+    grid-column: auto;
     grid-row: auto;
+  }
+
+  .result,
+  .questionnaire-analysis {
+    grid-column: auto;
   }
 
   .form-header {

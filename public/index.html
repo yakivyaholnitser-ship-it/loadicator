@@ -34,6 +34,58 @@
           <ul class="upload-list" id="upload-list"></ul>
         </section>
 
+        <section class="panel questionnaire-analysis" id="questionnaire-analysis">
+          <div class="analysis-header">
+            <div>
+              <p class="eyebrow">Temporary review</p>
+              <h2>Questionnaire Analysis</h2>
+            </div>
+            <span class="status-badge" id="analysis-status">Waiting for file</span>
+          </div>
+
+          <p id="analysis-summary">
+            Upload a Baltic Questionnaire to begin a structured review of the vessel particulars.
+          </p>
+
+          <div class="analysis-groups">
+            <section>
+              <h3>Vessel particulars</h3>
+              <dl class="analysis-list" id="particulars-analysis">
+                <div><dt>Questionnaire</dt><dd>Not reviewed</dd></div>
+              </dl>
+            </section>
+
+            <section>
+              <h3>Cargo spaces</h3>
+              <dl class="analysis-list" id="capacity-analysis">
+                <div><dt>Questionnaire</dt><dd>Not reviewed</dd></div>
+              </dl>
+            </section>
+
+            <section>
+              <h3>Capacity only</h3>
+              <dl class="analysis-list" id="tank-analysis">
+                <div><dt>Fresh water tanks</dt><dd>Not current ROB</dd></div>
+                <div><dt>Bunker tanks</dt><dd>Not current ROB</dd></div>
+              </dl>
+            </section>
+
+            <section>
+              <h3>Voyage inputs</h3>
+              <dl class="analysis-list" id="voyage-analysis">
+                <div><dt>Water density</dt><dd>Required separately</dd></div>
+                <div><dt>Current bunkers</dt><dd>Required separately</dd></div>
+                <div><dt>Current fresh water</dt><dd>Required separately</dd></div>
+              </dl>
+            </section>
+          </div>
+
+          <div class="analysis-notes">
+            <strong>Review notes</strong>
+            <p id="analysis-notes">No questionnaire has been reviewed yet.</p>
+          </div>
+        </section>
+
         <form class="panel calculator" id="uptake-form">
           <div class="form-header">
             <div>
