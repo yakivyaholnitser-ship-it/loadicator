@@ -53,7 +53,10 @@ textarea {
   align-self: start;
 }
 
-.intro-check-button {
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 8px;
 }
 
