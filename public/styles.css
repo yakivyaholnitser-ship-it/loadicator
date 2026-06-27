@@ -53,6 +53,10 @@ textarea {
   align-self: start;
 }
 
+.intro-check-button {
+  margin-top: 8px;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--accent);
