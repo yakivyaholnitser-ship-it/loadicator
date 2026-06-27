@@ -22,6 +22,17 @@ Open:
 http://localhost:5173
 ```
 
+### Portable Node on restricted Windows machines
+
+When Codex has workspace-only execution permissions, copy a portable Node.js
+distribution into `.tools/node/`. The `.tools/` directory is ignored by Git,
+and Codex can run the local runtime without requesting access outside the repo:
+
+```powershell
+& ".\.tools\node\npm.cmd" test
+& ".\.tools\node\npm.cmd" run dev
+```
+
 ## Test
 
 ```bash

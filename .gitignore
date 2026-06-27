@@ -9,5 +9,6 @@ tmp/
 # Local vessel documents, licensed software exports, and confidential fixtures.
 local-data/
 private-data/
+.tools/
 *.lic
 *.license
