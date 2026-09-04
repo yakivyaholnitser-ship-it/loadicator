@@ -17,9 +17,26 @@
           </p>
           <div class="intro-actions">
             <button type="button">проверка для яши</button>
-            <button type="button">жопа товарища</button>
+            <button type="button">Проверка</button>
           </div>
         </div>
+
+        <section class="panel" id="vessel-holds" hidden>
+          <p class="eyebrow">Grain capacity · Baltic 99</p>
+          <h2 id="vessel-name"></h2>
+          <p id="vessel-source"></p>
+          <button type="button" id="apply-vessel">Apply vessel + grain SF 1.189</button>
+          <p id="hold-sf"></p>
+          <div style="overflow-x:auto"><table style="width:100%;text-align:right">
+            <thead><tr><th>Hold</th><th>Grain m³</th><th>Capacity at SF, mt</th></tr></thead>
+            <tbody id="hold-rows"></tbody>
+          </table></div>
+          <p id="hold-total"></p>
+          <h3>Grain loading · Bow → Stern</h3>
+          <div id="hold-diagram" class="hold-diagram"></div>
+          <p id="allocation-summary" aria-live="polite"></p>
+          <p class="notice">Maximize full holds; prefer one central slack hold. Volume allocation only. Baseline: summer DWT, seawater 1.025, no additional port draft restriction, HFO 1,000 mt, diesel 250 mt, fresh water 200 mt. Constants and unpumpable ballast come from the questionnaire. Stability and strength are not calculated.</p>
+        </section>
 
         <section class="panel importer">
           <p class="eyebrow">Vessel data</p>
@@ -170,6 +187,7 @@
               TPC mt/cm
               <input name="tpcMt" type="number" step="0.01" value="67" />
             </label>
+            <label>FWA mm<input name="fwaMm" type="number" step="0.1" value="0" /></label>
             <label>
               Grain capacity cbm
               <input name="grainCapacityCbm" type="number" step="0.01" value="97000" />

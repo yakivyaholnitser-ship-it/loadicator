@@ -7,6 +7,7 @@ import { analyzeCharteringTask, isOpenAiConfigured } from "./ai/openaiTaskAnalyz
 import { loadLocalEnv } from "./config/loadEnv.js";
 
 await loadLocalEnv();
+const basicShip = JSON.parse(await readFile(new URL("./data/basic-ship.json", import.meta.url), "utf8"));
 
 const PORT = Number(process.env.PORT) || 5173;
 const ROOT = fileURLToPath(new URL("../public", import.meta.url));
@@ -121,6 +122,16 @@ async function serveStatic(request, response) {
 }
 
 const server = createServer(async (request, response) => {
+  if (request.method === "GET" && request.url === "/api/vessel") {
+    try {
+      const vessel = basicShip;
+      sendJson(response, 200, vessel);
+    } catch {
+      sendJson(response, 404, { error: "No local vessel data available" });
+    }
+    return;
+  }
+
   if (request.method === "GET" && request.url === "/api/health") {
     sendJson(response, 200, { ok: true, service: "loadicator" });
     return;
@@ -200,7 +211,7 @@ const server = createServer(async (request, response) => {
           task = {
             ...task,
             status: "completed",
-            ...(await analyzeCharteringTask(message, await latestQuestionnaireAnalysis()))
+            ...(await analyzeCharteringTask(message, { basicShip, reviewedQuestionnaire: await latestQuestionnaireAnalysis() }))
           };
           await writeFile(taskPath, JSON.stringify(task, null, 2));
         } catch (error) {

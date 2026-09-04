@@ -1,3 +1,4 @@
+import { allocateGrain } from "/holdAllocation.js";
 const form = document.querySelector("#uptake-form");
 const result = document.querySelector("#result");
 const questionnaireFile = document.querySelector("#questionnaire-file");
@@ -319,7 +320,9 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
-  renderResult(await response.json());
+  const calculation = await response.json();
+  renderResult(calculation);
+  document.dispatchEvent(new CustomEvent("uptake-calculated", { detail: calculation }));
 });
 
 loadUploads();
@@ -328,3 +331,71 @@ loadPanamaxStandards();
 renderStowageFactorConversion();
 loadTasks();
 loadAiStatus();
+
+
+async function loadVesselHolds() {
+  const panel = document.querySelector("#vessel-holds");
+  try {
+    const response = await fetch("/api/vessel");
+    if (!response.ok) return;
+    const vessel = await response.json();
+    document.querySelector("#vessel-name").textContent = `${vessel.name} · Basic ship · IMO ${vessel.imo}`;
+    document.querySelector("#vessel-source").textContent = vessel.source;
+    const number = value => value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    function renderHolds() {
+      const sf = Number(stowageFactorInput.value) * (stowageFactorUnit.value === "cuft/mt" ? CUBIC_FEET_TO_CUBIC_METERS : 1);
+      const valid = Number.isFinite(sf) && sf > 0;
+      document.querySelector("#hold-sf").textContent = valid ? `Current SF: ${sf.toFixed(6)} m³/mt` : "Enter a positive stowage factor.";
+      document.querySelector("#hold-rows").replaceChildren(...vessel.holds.map((capacity, index) => {
+        const row = document.createElement("tr");
+        for (const value of [index + 1, number(capacity), valid ? number(capacity / sf) : "—"]) {
+          const cell = document.createElement("td"); cell.textContent = value; row.append(cell);
+        }
+        return row;
+      }));
+      const total = vessel.holds.reduce((sum, value) => sum + value, 0);
+      document.querySelector("#hold-total").textContent = `Total grain: ${number(total)} m³` + (valid ? ` · Cubic limit: ${number(total / sf)} mt` : "");
+    }
+    const holdDiagram = document.querySelector("#hold-diagram");
+    const allocationSummary = document.querySelector("#allocation-summary");
+    function clearAllocation() {
+      holdDiagram.replaceChildren();
+      allocationSummary.textContent = "Inputs changed. Press Calculate to update hold loading.";
+    }
+    form.addEventListener("input", clearAllocation);
+    form.addEventListener("change", clearAllocation);
+    applyStandardsButton.addEventListener("click", clearAllocation);
+    document.addEventListener("uptake-calculated", ({ detail }) => {
+      try {
+        const sf = Number(stowageFactorInput.value) * (stowageFactorUnit.value === "cuft/mt" ? CUBIC_FEET_TO_CUBIC_METERS : 1);
+        const totalCapacity = vessel.holds.reduce((a, b) => a + b, 0);
+        if (Math.abs(Number(form.elements.grainCapacityCbm.value) - totalCapacity) > 0.01) throw new Error("Grain total differs from this vessel's holds. Apply vessel data first.");
+        const rows = allocateGrain(vessel.holds, sf, detail.maxCargoMt);
+        holdDiagram.replaceChildren(...rows.map(row => {
+          const card = document.createElement("article");
+          card.className = `hold-card ${row.status.toLowerCase()}`;
+          card.innerHTML = `<h3>Hold ${row.hold}</h3><span class="hold-status">${row.status}</span>
+            <div class="hold-tank"><div class="grain-fill" style="height:${row.percent}%"></div><strong>${row.percent.toFixed(1)}%</strong></div>
+            <b>${number(row.cargoMt)} mt</b><small>${number(row.volumeCbm)} / ${number(row.capacity)} m³</small>`;
+          return card;
+        }));
+        const loaded = rows.reduce((sum, row) => sum + row.cargoMt, 0);
+        allocationSummary.textContent = `Grain: ${number(loaded)} mt · Full holds: ${rows.filter(row => row.status === "FULL").length} · Slack: ${rows.filter(row => row.status === "SLACK").map(row => row.hold).join(", ") || "none"} · Free volume: ${number(totalCapacity - loaded * sf)} m³. Percent shows volume, not physical cargo height.`;
+      } catch (error) { holdDiagram.replaceChildren(); allocationSummary.textContent = error.message; }
+    });
+    document.querySelector("#apply-vessel").addEventListener("click", () => {
+      setNamedInputs(form, vessel.inputs);
+      stowageFactorUnit.value = "cbm/mt";
+      previousStowageFactorUnit = "cbm/mt";
+      renderStowageFactorConversion(); renderHolds(); form.requestSubmit();
+    });
+    stowageFactorInput.addEventListener("input", renderHolds);
+    stowageFactorUnit.addEventListener("change", renderHolds);
+    panel.hidden = false;
+    document.querySelector("#apply-vessel").click();
+  } catch (error) {
+    panel.hidden = false;
+    document.querySelector("#vessel-source").textContent = `Could not load holds: ${error.message}`;
+  }
+}
+loadVesselHolds();

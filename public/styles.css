@@ -513,3 +513,14 @@ input:focus {
     flex-direction: column;
   }
 }
+
+#vessel-holds { grid-column: 1 / -1; }
+.hold-diagram { display:grid; grid-template-columns:repeat(7,minmax(115px,1fr)); gap:12px; overflow-x:auto; padding:12px 0; }
+.hold-card { text-align:center; padding:14px 8px; border:1px solid #cbd5e1; border-radius:12px; background:#f8fafc; color:#172c3d; }
+.hold-card h3 { margin:0 0 6px; }
+.hold-card small { display:block; margin-top:8px; font-size:11px; }
+.hold-status { font-size:11px; font-weight:bold; letter-spacing:1px; }
+.hold-tank { position:relative; overflow:hidden; height:150px; margin:12px 0; border:2px solid #334155; border-radius:5px 5px 22px 22px; background:#e2e8f0; display:grid; place-items:center; }
+.grain-fill { position:absolute; bottom:0; width:100%; background:repeating-linear-gradient(35deg,#dfb55e 0px,#dfb55e 5px,#eac477 5px,#eac477 8px); }
+.hold-tank strong { position:relative; z-index:1; background:#ffffffdb; border-radius:5px; padding:4px; }
+.hold-card.slack { border:2px solid #b7791f; background:#fff8e8; }

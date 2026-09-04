@@ -116,3 +116,15 @@ The app should help chartering users estimate cargo intake before fixture. It is
 not a class-approved onboard loadicator. Stability, trim, hull strength, and
 vessel-specific limits must eventually come from approved vessel documents and
 be clearly surfaced as assumptions.
+
+## Basic ship
+
+PACIFIC CELERITY (IMO 1047536) is the project default. Its Baltic 99 questionnaire
+values, source date, seven grain hold capacities and vessel particulars are kept
+in `src/data/basic-ship.json`, included in Git at the user's request. No local-data
+copy is required on another computer. Blank questionnaire fields remain unknown.
+The default profile is also supplied as context to the Task Desk. Explicit task
+values override defaults; another named vessel must use its own particulars.
+`baselineScenario` contains voyage assumptions separately from `particulars`;
+tank capacity must not be used as ROB. Source questionnaire values are historical,
+not automatically refreshed certification or vessel status.
